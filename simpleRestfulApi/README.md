@@ -30,6 +30,10 @@ $ curl -X DELETE http://localhost:3000/api/courses/2
 ```
 $ heroku login
 $ heroku git:remote -a pj-name
+$ git push heroku master
 
-
+```
+# herokuから削除
+```
+$ heroku git:remote -a pj-name
 ```
