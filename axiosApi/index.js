@@ -21,8 +21,8 @@ app.get("/", (req, res) => {
   res.send("Simple REST API");
 });
 
-// curl -X GET http://localhost:3000/api/courses | jq
-app.get("/api/courses", (req, res) => {
+// curl -X GET http://localhost:3000/api/single | jq
+app.get("/api/single", (req, res) => {
   const axios = axiosBase.create({
     baseURL: "https://jsonplaceholder.typicode.com",
     headers: {
@@ -48,6 +48,58 @@ app.get("/api/courses", (req, res) => {
       res.send("error");
     });
 });
+
+app.get("/api/double", async (req, res) => {
+  const axios = axiosBase.create({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    responseType: "json"
+  });
+
+  let titles;
+
+  console.log("debug asyncCall start");
+  titles = await asyncCall(axios);
+  console.log(titles);
+  console.log("debug asyncCall end");
+
+  res.send("ok");
+});
+
+async function asyncCall(axios) {
+  let titles;
+
+  console.log("debug start");
+  let title1 = await axios
+    .get("/posts/1")
+    .then(function(response) {
+      return response.data;
+    })
+    .catch(function(error) {
+      console.log("ERROR!! occurred in Backend.");
+      return "error";
+    });
+
+  let title2 = await axios
+    .get("/posts/2")
+    .then(function(response) {
+      return response.data;
+    })
+    .catch(function(error) {
+      console.log("ERROR!! occurred in Backend.");
+      return "error";
+    });
+
+  titles = {
+    memo1: title1,
+    memo2: title2
+  };
+
+  return titles;
+}
 
 // curl -X POST http://localhost:3000/api/courses -H "Accept: application/json" -H "Content-type: application/json" -d '{ "name" : "tanaka" }'
 app.post("/api/courses", (req, res) => {
