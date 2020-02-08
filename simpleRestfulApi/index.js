@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 app.use(express.json());
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
 
 // datasource
@@ -22,6 +22,14 @@ app.get("/", (req, res) => {
 // curl -X GET http://localhost:3000/api/courses | jq
 app.get("/api/courses", (req, res) => {
   res.send(courses);
+});
+
+// curl -X GET http://localhost:3000/api/sleep/:timeout | jq
+app.get("/api/sleep/:timeout", (req, res) => {
+  console.log(req.params.timeout);
+  setTimeout(() => {
+    res.send(courses);
+  }, req.params.timeout);
 });
 
 // curl -X POST http://localhost:3000/api/courses -H "Accept: application/json" -H "Content-type: application/json" -d '{ "name" : "tanaka" }'
