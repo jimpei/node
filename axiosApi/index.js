@@ -51,7 +51,7 @@ app.get("/api/single", (req, res) => {
 
 app.get("/api/double", async (req, res) => {
   console.log("debug asyncCall start");
-  const titles = await asyncCall(axios);
+  const titles = await asyncCall();
   console.log(titles);
   console.log("debug asyncCall end");
 
@@ -105,6 +105,68 @@ async function asyncCall() {
   const titles = {
     memo1: title1,
     memo2: title2
+  };
+
+  return titles;
+}
+
+app.get("/api/double/asyncAll", async (req, res) => {
+  console.log("debug asyncAll asyncCall start");
+  const titles = await asyncAllCall();
+  console.log(titles);
+  console.log("debug asyncAll asyncCall end");
+
+  res.send("ok");
+});
+
+async function asyncAllCall() {
+  const axios = axiosBase.create({
+    baseURL: "https://jsonplaceholder.typicode.com",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    responseType: "json"
+  });
+
+  const axiosSleep = axiosBase.create({
+    baseURL: "http://localhost:3001",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    responseType: "json"
+  });
+
+  console.log("debug start");
+  // 検証のため、スリープ機能付きローカルAPIを叩いている
+  const title1 = axiosSleep
+    .get("/api/sleep/2000")
+    .then(function(response) {
+      console.log("api 1 done");
+      return response.data;
+    })
+    .catch(function(error) {
+      console.log("ERROR!! occurred in Backend.");
+      return "error";
+    });
+
+  // 1個目のAPIの完了を待たずに、とりあえず2個目のAPIを投げる
+  const title2 = axios
+    .get("/posts/2")
+    .then(function(response) {
+      console.log("api 2 done");
+      return response.data;
+    })
+    .catch(function(error) {
+      console.log("ERROR!! occurred in Backend.");
+      return "error";
+    });
+
+  // APIの結果格納時のみ同期を取る
+  const titles = {
+    memo1: await title1,
+    memo2: await title2
   };
 
   return titles;
