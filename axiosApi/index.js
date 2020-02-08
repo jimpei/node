@@ -50,6 +50,15 @@ app.get("/api/single", (req, res) => {
 });
 
 app.get("/api/double", async (req, res) => {
+  console.log("debug asyncCall start");
+  const titles = await asyncCall(axios);
+  console.log(titles);
+  console.log("debug asyncCall end");
+
+  res.send("ok");
+});
+
+async function asyncCall() {
   const axios = axiosBase.create({
     baseURL: "https://jsonplaceholder.typicode.com",
     headers: {
@@ -59,23 +68,21 @@ app.get("/api/double", async (req, res) => {
     responseType: "json"
   });
 
-  let titles;
-
-  console.log("debug asyncCall start");
-  titles = await asyncCall(axios);
-  console.log(titles);
-  console.log("debug asyncCall end");
-
-  res.send("ok");
-});
-
-async function asyncCall(axios) {
-  let titles;
+  const axiosSleep = axiosBase.create({
+    baseURL: "http://localhost:3001",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    responseType: "json"
+  });
 
   console.log("debug start");
-  let title1 = await axios
-    .get("/posts/1")
+  // 検証のため、スリープ機能付きローカルAPIを叩いている
+  const title1 = await axiosSleep
+    .get("/api/sleep/2000")
     .then(function(response) {
+      console.log("api 1 done");
       return response.data;
     })
     .catch(function(error) {
@@ -83,9 +90,11 @@ async function asyncCall(axios) {
       return "error";
     });
 
-  let title2 = await axios
+  // 1個目のAPIが完了したあとに、APIが実行される
+  const title2 = await axios
     .get("/posts/2")
     .then(function(response) {
+      console.log("api 2 done");
       return response.data;
     })
     .catch(function(error) {
@@ -93,7 +102,7 @@ async function asyncCall(axios) {
       return "error";
     });
 
-  titles = {
+  const titles = {
     memo1: title1,
     memo2: title2
   };
